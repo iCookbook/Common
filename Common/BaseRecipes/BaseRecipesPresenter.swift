@@ -11,8 +11,11 @@ import Networking
 import Resources
 
 open class BaseRecipesPresenter {
-    weak var view: BaseRecipesViewInput?
-    weak public var moduleOutput: BaseRecipesModuleOutput?
+    
+    // MARK: - Public Properties
+    
+    public weak var view: BaseRecipesViewInput?
+    public weak var moduleOutput: BaseRecipesModuleOutput?
     
     // MARK: - Private Properties
     

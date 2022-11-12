@@ -9,10 +9,10 @@
 import Networking
 
 open class BaseRecipesInteractor {
-    weak var output: BaseRecipesInteractorOutput?
     
     // MARK: - Public Properties
     
+    public weak var output: BaseRecipesInteractorOutput?
     public let networkManager: NetworkManagerProtocol
     
     // MARK: - Init
