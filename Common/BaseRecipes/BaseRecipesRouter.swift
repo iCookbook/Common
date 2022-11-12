@@ -7,17 +7,20 @@
 //
 
 import UIKit
+import Models
 import RecipeDetails
 
 open class BaseRecipesRouter {
-    weak var output: BaseRecipesRouterOutput?
-    weak var viewController: UIViewController?
+    public weak var output: BaseRecipesRouterOutput?
+    public weak var viewController: UIViewController?
+    
+    public init() {}
 }
 
 extension BaseRecipesRouter: BaseRecipesRouterInput {
     /// Opens details module for provided recipe
     /// - Parameter recipe: ``Recipe`` instance open details with.
-    func openRecipeDetailsModule(for recipe: Recipe) {
+    public func openRecipeDetailsModule(for recipe: Recipe) {
         let context = RecipeDetailsContext(moduleOutput: self, recipe: recipe)
         let assembly = RecipeDetailsAssembly.assemble(with: context)
         // hides tab bar

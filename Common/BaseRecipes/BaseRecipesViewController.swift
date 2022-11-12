@@ -17,16 +17,13 @@ import CommonUI
 /// * ``LargeRecipeCollectionViewCell``
 /// * ``UsualCollectionViewCell``
 /// And one footer (`UICollectionReusableView`): ``LoadingCollectionViewFooter``
-///
-/// All properties were made `public` because of inheritance.
 open class BaseRecipesViewController: UIViewController {
     
-    // MARK: - Private Properties
-    
-    private let output: BaseRecipesViewOutput
-    
     // MARK: - Public Properties
+    /// All properties were made `public` because of inheritance.
     
+    /// Output of the view (Presenter).
+    public let output: BaseRecipesViewOutput
     /// Array of recipes.
     public var data: [Recipe] = []
     /// Defines whether fetching is in progress. It is being used for pagination.
@@ -80,7 +77,11 @@ open class BaseRecipesViewController: UIViewController {
         isFetchingInProgress = false
     }
     
-    // MARK: - Public Methods
+    open func turnOnOfflineMode() {
+    }
+}
+
+extension BaseRecipesViewController: BaseRecipesViewInput {
     
     public func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
@@ -101,10 +102,17 @@ open class BaseRecipesViewController: UIViewController {
             })
         }
     }
-}
-
-extension BaseRecipesViewController: BaseRecipesViewInput {
     
+    public func showAlert(title: String, message: String) {
+        DispatchQueue.main.async {
+            self.resetAllActivity()
+            print("❗️Alert:", title, message)
+            
+            if self.data.isEmpty {
+                self.turnOnOfflineMode()
+            }
+        }
+    }
 }
 
 // MARK: - UICollectionView
@@ -133,6 +141,15 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 1.4, initialSpringVelocity: 0.1, options: .allowUserInteraction, animations: {
             cell.transform = CGAffineTransform.identity
         })
+    }
+    
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        /// We need to check that it is not a setup (first launch, when `collectionView.contentOffset.y == 0` and make usual check for the end of the collection (scroll) view.
+        if (scrollView.contentOffset.y != 0 &&
+            scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
+            /// Fetcing should not be in progress and there should be valid next page url.
+            guard !isFetchingInProgress, nextPageUrl != nil else { return }
+        }
     }
     
     // MARK: Footer
