@@ -44,7 +44,7 @@ open class BaseRecipesViewController: UIViewController {
     public lazy var recipesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.frame.size.width - 32, height: view.frame.size.height * 0.38)
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collectionView = CollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -52,6 +52,7 @@ open class BaseRecipesViewController: UIViewController {
         collectionView.register(RecipeCollectionViewCell.self, forCellWithReuseIdentifier: RecipeCollectionViewCell.identifier)
         collectionView.register(UsualCollectionViewCell.self, forCellWithReuseIdentifier: UsualCollectionViewCell.identifier)
         collectionView.register(LargeRecipeCollectionViewCell.self, forCellWithReuseIdentifier: LargeRecipeCollectionViewCell.identifier)
+        collectionView.register(TitleCollectionViewHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleCollectionViewHeader.identifier)
         collectionView.register(LoadingCollectionViewFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCollectionViewFooter.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -97,7 +98,7 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
             // no need to put self in capture list, because DispatchQueue does not capture it
             self.resetAllActivity()
             
-            UIView.transition(with: self.recipesCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: { [unowned self] in
+            UIView.transition(with: self.recipesCollectionView, duration: 0.55, options: .transitionCrossDissolve, animations: { [unowned self] in
                 recipesCollectionView.reloadData()
             })
         }
@@ -141,56 +142,6 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 1.4, initialSpringVelocity: 0.1, options: .allowUserInteraction, animations: {
             cell.transform = CGAffineTransform.identity
         })
-    }
-    
-    // MARK: Footer
-    
-    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        switch kind {
-        case UICollectionView.elementKindSectionFooter:
-            guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCollectionViewFooter.identifier, for: indexPath) as? LoadingCollectionViewFooter else {
-                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in viewForSupplementaryElementOfKind")
-            }
-            return footer
-        default:
-            // empty view
-            return UICollectionReusableView()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
-        switch elementKind {
-        case UICollectionView.elementKindSectionFooter:
-            guard let footer = view as? LoadingCollectionViewFooter else {
-                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
-            }
-            /// If there is link to the next page, start loading.
-            if nextPageUrl != nil {
-                footer.startActivityIndicator()
-            }
-        default:
-            break
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
-        switch elementKind {
-        case UICollectionView.elementKindSectionFooter:
-            guard let footer = view as? LoadingCollectionViewFooter else {
-                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in didEndDisplayingSupplementaryView")
-            }
-            footer.stopActivityIndicator()
-        default:
-            break
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        /// If there is link to the next page, set size for footer, if not, set size for small inset.
-        if nextPageUrl != nil {
-            return CGSize(width: view.frame.size.width, height: 80)
-        } else {
-            return CGSize(width: view.frame.size.width, height: 20)
-        }
+        output.didSelectRecipe(data[indexPath.row])
     }
 }
