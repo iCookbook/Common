@@ -143,15 +143,6 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         })
     }
     
-    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        /// We need to check that it is not a setup (first launch, when `collectionView.contentOffset.y == 0` and make usual check for the end of the collection (scroll) view.
-        if (scrollView.contentOffset.y != 0 &&
-            scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
-            /// Fetcing should not be in progress and there should be valid next page url.
-            guard !isFetchingInProgress, nextPageUrl != nil else { return }
-        }
-    }
-    
     // MARK: Footer
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
