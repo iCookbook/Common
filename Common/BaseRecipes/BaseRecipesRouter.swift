@@ -11,7 +11,7 @@ import Models
 import RecipeDetails
 
 open class BaseRecipesRouter {
-    public weak var output: BaseRecipesRouterOutput?
+    public weak var presenter: BaseRecipesRouterOutput?
     public weak var viewController: UIViewController?
     
     public init() {}

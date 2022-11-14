@@ -23,7 +23,7 @@ open class BaseRecipesViewController: UIViewController {
     /// All properties were made `public` because of inheritance.
     
     /// Output of the view (Presenter).
-    public let output: BaseRecipesViewOutput
+    public let presenter: BaseRecipesViewOutput
     /// Array of recipes.
     public var data: [Recipe] = []
     /// Defines whether fetching is in progress. It is being used for pagination.
@@ -60,8 +60,8 @@ open class BaseRecipesViewController: UIViewController {
     
     // MARK: - Init
     
-    public init(output: BaseRecipesViewOutput) {
-        self.output = output
+    public init(presenter: BaseRecipesViewOutput) {
+        self.presenter = presenter
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -142,6 +142,6 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         UIView.animate(withDuration: 0.7, delay: 0.0, usingSpringWithDamping: 1.4, initialSpringVelocity: 0.1, options: .allowUserInteraction, animations: {
             cell.transform = CGAffineTransform.identity
         })
-        output.didSelectRecipe(data[indexPath.row])
+        presenter.didSelectRecipe(data[indexPath.row])
     }
 }

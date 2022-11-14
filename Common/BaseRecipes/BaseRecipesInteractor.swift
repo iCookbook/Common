@@ -12,7 +12,7 @@ open class BaseRecipesInteractor {
     
     // MARK: - Public Properties
     
-    public weak var output: BaseRecipesInteractorOutput?
+    public weak var presenter: BaseRecipesInteractorOutput?
     public let networkManager: NetworkManagerProtocol
     
     // MARK: - Init
@@ -29,9 +29,9 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
         networkManager.getResponse(request: request) { [unowned self] (result) in
             switch result {
             case .success(let response):
-                output?.didProvidedResponse(response, withOverridingCurrentData: true)
+                presenter?.didProvidedResponse(response, withOverridingCurrentData: true)
             case .failure(let error):
-                output?.handleError(error)
+                presenter?.handleError(error)
             }
         }
     }

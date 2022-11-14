@@ -16,9 +16,6 @@ open class BaseRecipesPresenter {
     
     public weak var view: BaseRecipesViewInput?
     public weak var moduleOutput: BaseRecipesModuleOutput?
-    
-    // MARK: - Private Properties
-    
     public let router: BaseRecipesRouterInput
     public let interactor: BaseRecipesInteractorInput
     
