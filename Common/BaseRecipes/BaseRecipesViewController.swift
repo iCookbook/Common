@@ -36,6 +36,7 @@ open class BaseRecipesViewController: UIViewController {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.color = .gray
         activityIndicator.hidesWhenStopped = true
+        activityIndicator.layer.zPosition = 2
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         return activityIndicator
     }()
