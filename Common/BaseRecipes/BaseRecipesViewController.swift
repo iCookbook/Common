@@ -80,9 +80,6 @@ open class BaseRecipesViewController: UIViewController {
     
     open func turnOnOfflineMode() {
     }
-}
-
-extension BaseRecipesViewController: BaseRecipesViewInput {
     
     public func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
@@ -103,6 +100,9 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
             })
         }
     }
+}
+
+extension BaseRecipesViewController: BaseRecipesViewInput {
     
     public func showAlert(title: String, message: String) {
         DispatchQueue.main.async {
@@ -144,4 +144,56 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         })
         presenter.didSelectRecipe(data[indexPath.row])
     }
+    
+    // MARK: Footer
+    
+    open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionFooter:
+            guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCollectionViewFooter.identifier, for: indexPath) as? LoadingCollectionViewFooter else {
+                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in viewForSupplementaryElementOfKind")
+            }
+            return footer
+        default:
+            // empty view
+            return UICollectionReusableView()
+        }
+    }
+    
+    open func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+        switch elementKind {
+        case UICollectionView.elementKindSectionFooter:
+            guard let footer = view as? LoadingCollectionViewFooter else {
+                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
+            }
+            /// If there is link to the next page, start loading.
+            if nextPageUrl != nil {
+                footer.startActivityIndicator()
+            }
+        default:
+            break
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplayingSupplementaryView view: UICollectionReusableView, forElementOfKind elementKind: String, at indexPath: IndexPath) {
+        switch elementKind {
+        case UICollectionView.elementKindSectionFooter:
+            guard let footer = view as? LoadingCollectionViewFooter else {
+                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in didEndDisplayingSupplementaryView")
+            }
+            footer.stopActivityIndicator()
+        default:
+            break
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        /// If there is link to the next page, set size for footer, if not, set size for small inset.
+        if nextPageUrl != nil {
+            return CGSize(width: view.frame.size.width, height: 60)
+        } else {
+            return CGSize(width: view.frame.size.width, height: 20)
+        }
+    }
+
 }

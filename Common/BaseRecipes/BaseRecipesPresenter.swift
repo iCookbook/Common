@@ -36,6 +36,10 @@ extension BaseRecipesPresenter: BaseRecipesViewOutput {
         interactor.provideRandomData()
     }
     
+    public func requestData(urlString: String?) {
+        interactor.provideData(urlString: urlString)
+    }
+    
     public func didSelectRecipe(_ recipe: Recipe) {
         router.openRecipeDetailsModule(for: recipe)
     }

@@ -23,11 +23,13 @@ public protocol BaseRecipesViewInput: AnyObject {
 
 public protocol BaseRecipesViewOutput: AnyObject {
     func requestRandomData()
+    func requestData(urlString: String?)
     func didSelectRecipe(_ recipe: Recipe)
 }
 
 public protocol BaseRecipesInteractorInput: AnyObject {
     func provideRandomData()
+    func provideData(urlString: String?)
 }
 
 public protocol BaseRecipesInteractorOutput: AnyObject {
