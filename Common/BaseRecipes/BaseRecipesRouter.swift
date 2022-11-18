@@ -18,8 +18,9 @@ open class BaseRecipesRouter {
 }
 
 extension BaseRecipesRouter: BaseRecipesRouterInput {
-    /// Opens details module for provided recipe
-    /// - Parameter recipe: ``Recipe`` instance open details with.
+    /// Opens details module for provided recipe.
+    ///
+    /// - Parameter recipe: `Recipe` instance open details with.
     public func openRecipeDetailsModule(for recipe: Recipe) {
         let context = RecipeDetailsContext(moduleOutput: self, recipe: recipe)
         let assembly = RecipeDetailsAssembly.assemble(with: context)

@@ -13,10 +13,10 @@ import CommonUI
 /// `UIViewController` with collection view for recipes.
 ///
 /// It has collection view with registered collection view cells:
-/// * ``RecipeCollectionViewCell``
-/// * ``LargeRecipeCollectionViewCell``
-/// * ``UsualCollectionViewCell``
-/// And one footer (`UICollectionReusableView`): ``LoadingCollectionViewFooter``
+/// * `RecipeCollectionViewCell`
+/// * `LargeRecipeCollectionViewCell`
+/// * `UsualCollectionViewCell`
+/// And one footer (`UICollectionReusableView`): `LoadingCollectionViewFooter`
 open class BaseRecipesViewController: UIViewController {
     
     // MARK: - Public Properties
@@ -125,7 +125,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         data.count
     }
     
-    /// Defined as `public` because we need to override this method in ``DiscoverViewController``.
+    /// Defined as `public` because we need to override this method in `DiscoverViewController`.
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LargeRecipeCollectionViewCell.identifier, for: indexPath) as? LargeRecipeCollectionViewCell else {
             fatalError("Could not cast cell at indexPath \(indexPath) to 'UsualCollectionViewCell' in 'Discover' module")

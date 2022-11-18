@@ -47,8 +47,9 @@ extension BaseRecipesPresenter: BaseRecipesViewOutput {
 
 extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     /// Provides response from the interactor.
+    /// 
     /// - Parameters:
-    ///   - response: ``Response`` got from the server.
+    ///   - response: `Response` got from the server.
     ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
     public func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool) {
         var recipes = [Recipe]()
@@ -69,7 +70,8 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     }
     
     /// Provides data to show in alerts according to provided `error`.
-    /// - Parameter error: ``NetworkManagerError`` error instance.
+    ///
+    /// - Parameter error: `NetworkManagerError` error instance.
     public func handleError(_ error: NetworkManagerError) {
         switch error {
         case .invalidURL:
