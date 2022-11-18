@@ -60,10 +60,13 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
         }
         
         for hit in hits {
-            guard let recipe = hit.recipe else {
+            guard var recipe = hit.recipe else {
                 handleError(.parsingJSONError)
                 return
             }
+            // adds description of the recipe
+            // TODO: Replace this code to interactor, when providing image will be implemented
+            recipe.description = Texts.RecipeDetails.description(name: recipe.label ?? Texts.Discover.mockRecipeTitle, index: recipes.count)
             recipes.append(recipe)
         }
         view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
