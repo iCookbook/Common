@@ -94,16 +94,13 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
             // pagination
             data.append(contentsOf: newData)
         }
-        self.nextPageUrl = nextPageUrl
         
-        DispatchQueue.main.async {
-            // no need to put self in capture list, because DispatchQueue does not capture it
-            self.resetAllActivity()
-            
-            UIView.transition(with: self.recipesCollectionView, duration: 0.55, options: .transitionCrossDissolve, animations: { [unowned self] in
-                recipesCollectionView.reloadData()
-            })
-        }
+        self.nextPageUrl = nextPageUrl
+        self.resetAllActivity()
+        
+        UIView.transition(with: self.recipesCollectionView, duration: 0.55, options: .transitionCrossDissolve, animations: { [unowned self] in
+            recipesCollectionView.reloadData()
+        })
     }
     
     public func showAlert(title: String, message: String) {

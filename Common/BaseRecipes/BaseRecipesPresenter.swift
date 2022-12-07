@@ -19,13 +19,6 @@ open class BaseRecipesPresenter {
     public let router: BaseRecipesRouterInput
     public let interactor: BaseRecipesInteractorInput
     
-    // MARK: - Private Properties
-    
-    /// Link to the next page. We get value for this variable from `didProvidedResponse` method.
-    private var nextPageUrl: String = ""
-    /// Defines whether override previous data or append new data to the previous one. We get value for this variable from `didProvidedResponse` method.
-    private var withOverridingCurrentData: Bool = true
-    
     // MARK: - Init
     
     public init(router: BaseRecipesRouterInput, interactor: BaseRecipesInteractorInput) {
@@ -62,26 +55,15 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     ///   - response: `Response` got from the server.
     ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
     public func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool) {
-        self.withOverridingCurrentData = withOverridingCurrentData
-        nextPageUrl = response.links?.next?.href ?? ""
         var recipes = [Recipe]()
         
         for hit in response.hits ?? [] {
-            guard let recipe = hit.recipe else {
-                handleError(.decodingError)
-                return
-            }
-//            recipe.imageData = interactor.provideRawData(urlString: recipe.image)
+            guard var recipe = hit.recipe else { return } // do nothing, just skip
             // adds description of the recipe
             recipe.description = Texts.RecipeDetails.description(name: recipe.label ?? Texts.Discover.mockRecipeTitle, index: recipes.count)
             recipes.append(recipe)
         }
-        interactor.provideImageData(for: recipes)
-//        view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
-    }
-    
-    public func didProvidedImageData(for recipes: [Recipe]) {
-        view?.fillData(with: recipes, nextPageUrl: nextPageUrl, withOverridingCurrentData: withOverridingCurrentData)
+        view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
     }
     
     /// Provides data to show in alerts according to provided `error`.

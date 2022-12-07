@@ -30,13 +30,10 @@ public protocol BaseRecipesViewOutput: AnyObject {
 public protocol BaseRecipesInteractorInput: AnyObject {
     func provideRandomData()
     func provideData(urlString: String?)
-    func provideImageData(for recipes: [Recipe])
-    func provideRawData(urlString: String?) -> Data?
 }
 
 public protocol BaseRecipesInteractorOutput: AnyObject {
     func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool)
-    func didProvidedImageData(for recipes: [Recipe])
     func handleError(_ error: NetworkManagerError)
 }
 

@@ -27,10 +27,10 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     /// Provides random data.
     public func provideRandomData() {
         let request = NetworkRequest(endpoint: Endpoint.random())
-        networkManager.getResponse(request: request) { [unowned self] (result) in
+        networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
-                presenter?.didProvidedResponse(response, withOverridingCurrentData: true)
+                setImageData(for: response, withOverridingCurrentData: true)
             case .failure(let error):
                 presenter?.handleError(error)
             }
@@ -49,60 +49,39 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
         let endpoint = URLEndpoint(urlString: urlString)
         let request = NetworkRequest(endpoint: endpoint)
         
-        networkManager.getResponse(request: request) { [unowned self] (result) in
+        networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
-                presenter?.didProvidedResponse(response, withOverridingCurrentData: false)
+                setImageData(for: response, withOverridingCurrentData: false)
             case .failure(let error):
                 presenter?.handleError(error)
             }
         }
     }
     
-    public func provideImageData(for recipes: [Recipe]) {
+    private func setImageData(for response: Response, withOverridingCurrentData: Bool) {
         let group = DispatchGroup()
-        let queue = DispatchQueue.global(qos: .userInitiated)
         
-        for i in 0..<recipes.count {
+        for hit in response.hits ?? [] {
             group.enter()
-            print("1")
-            self.networkManager.obtainData(by: recipes[i].image ?? "") { [unowned self] (result) in
+            guard let recipe = hit.recipe else { return }
+            
+            let endpoint = URLEndpoint(urlString: recipe.image ?? "")
+            let request = NetworkRequest(endpoint: endpoint)
+            
+            networkManager.obtainData(request: request) { result in
                 switch result {
-                case .success(let newData):
-                    recipes[i].imageData = newData
+                case .success(let data):
+                    recipe.imageData = data
                 case .failure(_):
-                    recipes[i].imageData = nil
+                    recipe.imageData = nil
                 }
-                print("2")
                 group.leave()
             }
-            print("3")
         }
-        presenter?.didProvidedImageData(for: recipes)
-    }
-    
-    /// Provides **raw** data by provided url..
-    ///
-    /// - Parameter urlString: url link to the source of data.
-    public func provideRawData(urlString: String?) -> Data? {
         
-        var data: Data?
-        
-        guard let urlString = urlString else {
-            presenter?.handleError(.invalidURL)
-            return nil
+        group.notify(queue: .main) {
+            self.presenter?.didProvidedResponse(response, withOverridingCurrentData: withOverridingCurrentData)
         }
-        print("1")
-        networkManager.obtainData(by: urlString) { result in
-            switch result {
-            case .success(let newData):
-                data = newData
-            case .failure(_):
-                data = nil
-            }
-            print("2")
-        }
-        print("3")
-        return data
     }
 }
