@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Common'
-  s.version          = '0.4.2'
+  s.version          = '0.4.3'
   s.summary          = 'Common logic layer of the project.'
   s.homepage         = 'https://github.com/iCookbook/Common'
   s.author           = { 'htmlprogrammist' => '60363270+htmlprogrammist@users.noreply.github.com' }
@@ -14,4 +14,5 @@ Pod::Spec.new do |s|
   s.dependency 'Networking'
   s.dependency 'CommonUI'
   s.dependency 'RecipeDetails'
+  s.dependency 'Logger'
 end

@@ -19,6 +19,13 @@ open class BaseRecipesPresenter {
     public let router: BaseRecipesRouterInput
     public let interactor: BaseRecipesInteractorInput
     
+    // MARK: - Private Properties
+    
+    /// Link to the next page. We get value for this variable from `didProvidedResponse` method.
+    private var nextPageUrl: String = ""
+    /// Defines whether override previous data or append new data to the previous one. We get value for this variable from `didProvidedResponse` method.
+    private var withOverridingCurrentData: Bool = true
+    
     // MARK: - Init
     
     public init(router: BaseRecipesRouterInput, interactor: BaseRecipesInteractorInput) {
@@ -37,7 +44,10 @@ extension BaseRecipesPresenter: BaseRecipesViewOutput {
     }
     
     public func requestData(urlString: String?) {
-        interactor.provideData(urlString: urlString)
+        /// Because it is _event handling_, we need to use `userInteractive` quality of service.
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.interactor.provideData(urlString: urlString)
+        }
     }
     
     public func didSelectRecipe(_ recipe: Recipe) {
@@ -52,24 +62,26 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     ///   - response: `Response` got from the server.
     ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
     public func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool) {
+        self.withOverridingCurrentData = withOverridingCurrentData
+        nextPageUrl = response.links?.next?.href ?? ""
         var recipes = [Recipe]()
         
-        guard let hits = response.hits else {
-            handleError(.parsingJSONError)
-            return
-        }
-        
-        for hit in hits {
-            guard var recipe = hit.recipe else {
-                handleError(.parsingJSONError)
+        for hit in response.hits ?? [] {
+            guard let recipe = hit.recipe else {
+                handleError(.decodingError)
                 return
             }
+//            recipe.imageData = interactor.provideRawData(urlString: recipe.image)
             // adds description of the recipe
-            // TODO: Replace this code to interactor, when providing image will be implemented
             recipe.description = Texts.RecipeDetails.description(name: recipe.label ?? Texts.Discover.mockRecipeTitle, index: recipes.count)
             recipes.append(recipe)
         }
-        view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
+        interactor.provideImageData(for: recipes)
+//        view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
+    }
+    
+    public func didProvidedImageData(for recipes: [Recipe]) {
+        view?.fillData(with: recipes, nextPageUrl: nextPageUrl, withOverridingCurrentData: withOverridingCurrentData)
     }
     
     /// Provides data to show in alerts according to provided `error`.
@@ -78,13 +90,18 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     public func handleError(_ error: NetworkManagerError) {
         switch error {
         case .invalidURL:
-            view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.restartApp)
+            view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong)
         case .retainCycle:
             view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.restartApp)
+        case .invalidResponse:
+            view?.showAlert(title: Texts.Errors.networkError, message: Texts.Errors.somethingWentWrong)
+        case .unsuccessfulStatusCode(let statusCode):
+            view?.showAlert(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong)
         case .networkError(let error):
-            view?.showAlert(title: Texts.Errors.oops, message: "\(error.localizedDescription)")
-        case .parsingJSONError:
-            view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong)
+            view?.showAlert(title: Texts.Errors.networkError, message: "\(error.localizedDescription)")
+        case .decodingError:
+            #warning("По вашему запросу ничего не найдено")
+            view?.showAlert(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong)
         }
     }
 }

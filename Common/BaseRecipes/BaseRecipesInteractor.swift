@@ -7,6 +7,7 @@
 //
 
 import Networking
+import Models
 
 open class BaseRecipesInteractor {
     
@@ -37,6 +38,7 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     }
     
     /// Provides data by provided url.
+    ///
     /// - Parameter urlString: url link to the source of data.
     public func provideData(urlString: String?) {
         
@@ -45,8 +47,8 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
             return
         }
         let endpoint = URLEndpoint(urlString: urlString)
-        
         let request = NetworkRequest(endpoint: endpoint)
+        
         networkManager.getResponse(request: request) { [unowned self] (result) in
             switch result {
             case .success(let response):
@@ -55,5 +57,52 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
                 presenter?.handleError(error)
             }
         }
+    }
+    
+    public func provideImageData(for recipes: [Recipe]) {
+        let group = DispatchGroup()
+        let queue = DispatchQueue.global(qos: .userInitiated)
+        
+        for i in 0..<recipes.count {
+            group.enter()
+            print("1")
+            self.networkManager.obtainData(by: recipes[i].image ?? "") { [unowned self] (result) in
+                switch result {
+                case .success(let newData):
+                    recipes[i].imageData = newData
+                case .failure(_):
+                    recipes[i].imageData = nil
+                }
+                print("2")
+                group.leave()
+            }
+            print("3")
+        }
+        presenter?.didProvidedImageData(for: recipes)
+    }
+    
+    /// Provides **raw** data by provided url..
+    ///
+    /// - Parameter urlString: url link to the source of data.
+    public func provideRawData(urlString: String?) -> Data? {
+        
+        var data: Data?
+        
+        guard let urlString = urlString else {
+            presenter?.handleError(.invalidURL)
+            return nil
+        }
+        print("1")
+        networkManager.obtainData(by: urlString) { result in
+            switch result {
+            case .success(let newData):
+                data = newData
+            case .failure(_):
+                data = nil
+            }
+            print("2")
+        }
+        print("3")
+        return data
     }
 }

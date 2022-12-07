@@ -14,6 +14,7 @@ open class BaseRecipesRouter {
     public weak var presenter: BaseRecipesRouterOutput?
     public weak var viewController: UIViewController?
     
+    /// We need to use `public` initializer to create it's instance inside modules assemblies.
     public init() {}
 }
 

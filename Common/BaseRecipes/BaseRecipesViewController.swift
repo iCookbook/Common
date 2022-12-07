@@ -9,6 +9,7 @@
 import UIKit
 import Models
 import CommonUI
+import Logger
 
 /// `UIViewController` with collection view for recipes.
 ///
@@ -81,14 +82,17 @@ open class BaseRecipesViewController: UIViewController {
     
     open func turnOnOfflineMode() {
     }
+}
+
+extension BaseRecipesViewController: BaseRecipesViewInput {
     
-    public func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
+    public func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
             // first setup or pull to refresh
-            self.data = data
+            data = newData
         } else {
             // pagination
-            self.data.append(contentsOf: data)
+            data.append(contentsOf: newData)
         }
         self.nextPageUrl = nextPageUrl
         
@@ -101,15 +105,14 @@ open class BaseRecipesViewController: UIViewController {
             })
         }
     }
-}
-
-extension BaseRecipesViewController: BaseRecipesViewInput {
     
     public func showAlert(title: String, message: String) {
         DispatchQueue.main.async {
             self.resetAllActivity()
-            print("❗️Alert:", title, message)
             
+            let alertController = AlertController(title: title, message: message)
+            self.present(alertController, animated: true)
+            Logger.log("Presented", logType: .info)
             if self.data.isEmpty {
                 self.turnOnOfflineMode()
             }
@@ -156,8 +159,8 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
             }
             return footer
         default:
-            // empty view
-            return UICollectionReusableView()
+            Logger.log("`default` case was called, but it should never be called", logType: .warning, shouldLogContext: true)
+            return UICollectionReusableView() // empty view
         }
     }
     
@@ -172,7 +175,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
                 footer.startActivityIndicator()
             }
         default:
-            break
+            Logger.log("`default` case was called, but it should never be called", logType: .warning, shouldLogContext: true)
         }
     }
     
@@ -184,7 +187,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
             }
             footer.stopActivityIndicator()
         default:
-            break
+            Logger.log("`default` case was called, but it should never be called", logType: .warning, shouldLogContext: true)
         }
     }
     
