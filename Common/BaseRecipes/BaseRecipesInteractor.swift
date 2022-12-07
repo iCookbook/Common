@@ -8,6 +8,7 @@
 
 import Networking
 import Models
+import Resources
 
 open class BaseRecipesInteractor {
     
@@ -59,12 +60,17 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
         }
     }
     
+    /// Sets images' raw data for recipes in `response`.
+    /// - Parameters:
+    ///   - response: server response provided from any of the server data providing methods above.
+    ///   - withOverridingCurrentData: defines whether to override current data with the new one or not.
     private func setImageData(for response: Response, withOverridingCurrentData: Bool) {
         let group = DispatchGroup()
         
         for hit in response.hits ?? [] {
-            group.enter()
             guard let recipe = hit.recipe else { return }
+            
+            group.enter()
             
             let endpoint = URLEndpoint(urlString: recipe.image ?? "")
             let request = NetworkRequest(endpoint: endpoint)
@@ -74,8 +80,9 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
                 case .success(let data):
                     recipe.imageData = data
                 case .failure(_):
-                    recipe.imageData = nil
+                    recipe.imageData = Resources.Images.sampleRecipeImage?.pngData()
                 }
+                
                 group.leave()
             }
         }

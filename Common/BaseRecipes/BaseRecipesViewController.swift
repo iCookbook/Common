@@ -108,8 +108,9 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
             self.resetAllActivity()
             
             let alertController = AlertController(title: title, message: message)
+            alertController.modalPresentationStyle = .custom
             self.present(alertController, animated: true)
-            Logger.log("Presented", logType: .info)
+            
             if self.data.isEmpty {
                 self.turnOnOfflineMode()
             }
