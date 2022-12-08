@@ -24,6 +24,7 @@ open class BaseRecipesInteractor {
 }
 
 extension BaseRecipesInteractor: BaseRecipesInteractorInput {
+    
     /// Provides random data.
     public func provideRandomData() {
         let request = NetworkRequest(endpoint: Endpoint.random())
@@ -60,6 +61,7 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     }
     
     /// Sets images' raw data for recipes in `response`.
+    ///
     /// - Parameters:
     ///   - response: server response provided from any of the server data providing methods above.
     ///   - withOverridingCurrentData: defines whether to override current data with the new one or not.

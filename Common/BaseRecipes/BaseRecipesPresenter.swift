@@ -58,7 +58,7 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
         var recipes = [Recipe]()
         
         for hit in response.hits ?? [] {
-            guard var recipe = hit.recipe else { return } // do nothing, just skip
+            guard let recipe = hit.recipe else { return } // else do nothing
             // adds description of the recipe
             recipe.description = Texts.RecipeDetails.description(name: recipe.label ?? Texts.Discover.mockRecipeTitle, index: recipes.count)
             recipes.append(recipe)
