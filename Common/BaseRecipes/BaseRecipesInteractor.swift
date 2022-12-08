@@ -8,7 +8,6 @@
 
 import Networking
 import Models
-import Resources
 
 open class BaseRecipesInteractor {
     
@@ -80,7 +79,7 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
                 case .success(let data):
                     recipe.imageData = data
                 case .failure(_):
-                    recipe.imageData = Resources.Images.sampleRecipeImage?.pngData()
+                    recipe.imageData = nil
                 }
                 
                 group.leave()
