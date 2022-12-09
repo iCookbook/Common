@@ -70,20 +70,22 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     ///
     /// - Parameter error: `NetworkManagerError` error instance.
     public func handleError(_ error: NetworkManagerError) {
-        switch error {
-        case .invalidURL:
-            view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong)
-        case .retainCycle:
-            view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.restartApp)
-        case .invalidResponse:
-            view?.showAlert(title: Texts.Errors.networkError, message: Texts.Errors.somethingWentWrong)
-        case .unsuccessfulStatusCode(let statusCode):
-            view?.showAlert(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong)
-        case .networkError(let error):
-            view?.showAlert(title: Texts.Errors.networkError, message: "\(error.localizedDescription)")
-        case .decodingError:
-            #warning("По вашему запросу ничего не найдено")
-            view?.showAlert(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong)
+        DispatchQueue.main.async {
+            switch error {
+            case .invalidURL:
+                self.view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+            case .retainCycle:
+                self.view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.restartApp, image: Resources.Images.Errors.network)
+            case .invalidResponse:
+                self.view?.showAlert(title: Texts.Errors.networkError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+            case .unsuccessfulStatusCode(let statusCode):
+                self.view?.showAlert(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+            case .networkError(let error):
+                self.view?.showAlert(title: Texts.Errors.networkError, message: "\(error.localizedDescription)", image: Resources.Images.Errors.network)
+            case .decodingError:
+                #warning("По вашему запросу ничего не найдено")
+                self.view?.showAlert(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+            }
         }
     }
 }

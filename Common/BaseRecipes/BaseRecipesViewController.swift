@@ -103,17 +103,15 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
         })
     }
     
-    public func showAlert(title: String, message: String) {
-        DispatchQueue.main.async {
-            self.resetAllActivity()
-            
-            let alertController = AlertController(title: title, message: message)
-            alertController.modalPresentationStyle = .custom
-            self.present(alertController, animated: true)
-            
-            if self.data.isEmpty {
-                self.turnOnOfflineMode()
-            }
+    public func showAlert(title: String, message: String, image: UIImage?) {
+        self.resetAllActivity()
+        
+        let alertController = AlertController(title: title, message: message, image: image)
+        alertController.modalPresentationStyle = .custom
+        self.present(alertController, animated: true)
+        
+        if self.data.isEmpty {
+            self.turnOnOfflineMode()
         }
     }
 }

@@ -18,7 +18,7 @@ public protocol BaseRecipesModuleOutput: AnyObject {
 
 public protocol BaseRecipesViewInput: AnyObject {
     func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool)
-    func showAlert(title: String, message: String)
+    func showAlert(title: String, message: String, image: UIImage?)
 }
 
 public protocol BaseRecipesViewOutput: AnyObject {

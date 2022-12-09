@@ -6,6 +6,7 @@
 //  
 //
 
+import Foundation
 import Networking
 import Models
 
@@ -65,26 +66,29 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     /// - Parameters:
     ///   - response: server response provided from any of the server data providing methods above.
     ///   - withOverridingCurrentData: defines whether to override current data with the new one or not.
-    private func setImageData(for response: Response, withOverridingCurrentData: Bool) {
+    public func setImageData(for response: Response, withOverridingCurrentData: Bool) {
         let group = DispatchGroup()
+        let queue = DispatchQueue.global(qos: .userInitiated)
         
         for hit in response.hits ?? [] {
             guard let recipe = hit.recipe else { return }
             
             group.enter()
             
-            let endpoint = URLEndpoint(urlString: recipe.image ?? "")
-            let request = NetworkRequest(endpoint: endpoint)
-            
-            networkManager.obtainData(request: request) { result in
-                switch result {
-                case .success(let data):
-                    recipe.imageData = data
-                case .failure(_):
-                    recipe.imageData = nil
-                }
+            queue.async {
+                let endpoint = URLEndpoint(urlString: recipe.image ?? "")
+                let request = NetworkRequest(endpoint: endpoint)
                 
-                group.leave()
+                self.networkManager.obtainData(request: request) { result in
+                    switch result {
+                    case .success(let data):
+                        recipe.imageData = data
+                    case .failure(_):
+                        recipe.imageData = nil
+                    }
+                    
+                    group.leave()
+                }
             }
         }
         
