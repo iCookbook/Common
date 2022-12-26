@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 11.11.2022.
 //  
-//
 
 import UIKit
 import Models

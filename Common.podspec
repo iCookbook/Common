@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Common'
-  s.version          = '0.4.5'
+  s.version          = '0.4.6'
   s.summary          = 'Common logic layer of the project.'
   s.homepage         = 'https://github.com/iCookbook/Common'
   s.author           = { 'htmlprogrammist' => '60363270+htmlprogrammist@users.noreply.github.com' }

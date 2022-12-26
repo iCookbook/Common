@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 11.11.2022.
 //  
-//
 
 import Foundation
 import Networking
@@ -28,7 +27,9 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     
     /// Provides random data.
     public func provideRandomData() {
-        let request = NetworkRequest(endpoint: Endpoint.random())
+        let endpoint = Endpoint.random()
+        let request = NetworkRequest(endpoint: endpoint)
+        
         networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
@@ -64,7 +65,7 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
     /// Sets images' raw data for recipes in `response`.
     ///
     /// - Parameters:
-    ///   - response: server response provided from any of the server data providing methods above.
+    ///   - response: server response provided from the methods above.
     ///   - withOverridingCurrentData: defines whether to override current data with the new one or not.
     public func setImageData(for response: Response, withOverridingCurrentData: Bool) {
         let group = DispatchGroup()

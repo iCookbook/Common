@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 11.11.2022.
 //  
-//
 
 import UIKit
 import Models
@@ -80,13 +79,21 @@ open class BaseRecipesViewController: UIViewController {
         isFetchingInProgress = false
     }
     
+    /// Method responsible for turning offline mode on.
+    ///
+    /// It is empty, because every view controller turns offline mode in its' special way, but we need to call it from here.
     open func turnOnOfflineMode() {
     }
-}
-
-extension BaseRecipesViewController: BaseRecipesViewInput {
     
-    public func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
+    /// Fills data for collection view.
+    ///
+    /// - Parameters:
+    ///   - newData: new data to display.
+    ///   - nextPageUrl: link to the next page.
+    ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
+    ///
+    /// - Note: method was declared in `BaseRecipesViewInput` protocol.
+    open func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
             // first setup or pull to refresh
             data = newData
@@ -102,14 +109,25 @@ extension BaseRecipesViewController: BaseRecipesViewInput {
             recipesCollectionView.reloadData()
         })
     }
+}
+
+extension BaseRecipesViewController: BaseRecipesViewInput {
     
-    public func showAlert(title: String, message: String, image: UIImage?) {
+    // MARK: - Public Methods
+    
+    /// Displays error with provided data.
+    ///
+    /// - Parameters:
+    ///   - title: error title.
+    ///   - message: error description.
+    ///   - image: error image.
+    public func displayError(title: String, message: String, image: UIImage?) {
         self.resetAllActivity()
         
-        let alertController = AlertController(title: title, message: message, image: image)
-        alertController.modalPresentationStyle = .custom
-        self.present(alertController, animated: true)
+        /// Opens custom alert.
+        showAlert(title: title, message: message, image: image)
         
+        /// If data was not provided, turn on offline mode.
         if self.data.isEmpty {
             self.turnOnOfflineMode()
         }

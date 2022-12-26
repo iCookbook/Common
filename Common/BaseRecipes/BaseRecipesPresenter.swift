@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 11.11.2022.
 //  
-//
 
 import Models
 import Networking
@@ -73,18 +72,18 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
         DispatchQueue.main.async {
             switch error {
             case .invalidURL:
-                self.view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: Texts.Errors.oops, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
             case .retainCycle:
-                self.view?.showAlert(title: Texts.Errors.oops, message: Texts.Errors.restartApp, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: Texts.Errors.oops, message: Texts.Errors.restartApp, image: Resources.Images.Errors.network)
             case .invalidResponse:
-                self.view?.showAlert(title: Texts.Errors.networkError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: Texts.Errors.networkError, message: Texts.Errors.networkErrorDescription, image: Resources.Images.Errors.network)
             case .unsuccessfulStatusCode(let statusCode):
-                self.view?.showAlert(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
             case .networkError(let error):
-                self.view?.showAlert(title: Texts.Errors.networkError, message: "\(error.localizedDescription)", image: Resources.Images.Errors.network)
+                self.view?.displayError(title: Texts.Errors.networkError, message: "\(error.localizedDescription)", image: Resources.Images.Errors.network)
             case .decodingError:
                 #warning("По вашему запросу ничего не найдено")
-                self.view?.showAlert(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
             }
         }
     }

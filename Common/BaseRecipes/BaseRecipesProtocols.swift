@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 11.11.2022.
 //  
-//
 
 import Models
 import Networking
@@ -18,7 +17,7 @@ public protocol BaseRecipesModuleOutput: AnyObject {
 
 public protocol BaseRecipesViewInput: AnyObject {
     func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool)
-    func showAlert(title: String, message: String, image: UIImage?)
+    func displayError(title: String, message: String, image: UIImage?)
 }
 
 public protocol BaseRecipesViewOutput: AnyObject {
