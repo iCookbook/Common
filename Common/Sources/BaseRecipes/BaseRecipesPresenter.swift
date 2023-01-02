@@ -78,7 +78,7 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
             case .invalidResponse:
                 self.view?.displayError(title: Texts.Errors.networkError, message: Texts.Errors.networkErrorDescription, image: Resources.Images.Errors.network)
             case .unsuccessfulStatusCode(let statusCode):
-                self.view?.displayError(title: "\(Texts.Errors.error) \(statusCode)", message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
+                self.view?.displayError(title: "\(Texts.Errors.error) \(statusCode.rawValue)", message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
             case .networkError(let error):
                 self.view?.displayError(title: Texts.Errors.networkError, message: "\(error.localizedDescription)", image: Resources.Images.Errors.network)
             case .decodingError:
