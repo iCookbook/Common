@@ -18,6 +18,11 @@ open class BaseRecipesPresenter {
     public let router: BaseRecipesRouterInput
     public let interactor: BaseRecipesInteractorInput
     
+    /// Defines whether fetching is in progress. It is being used for pagination.
+    public var isFetchingInProgress = false
+    /// Link to the next page. It is being used for pagination.
+    public var nextPageUrl: String?
+    
     // MARK: - Init
     
     public init(router: BaseRecipesRouterInput, interactor: BaseRecipesInteractorInput) {
@@ -31,19 +36,39 @@ extension BaseRecipesPresenter: BaseRecipesModuleInput {
 
 extension BaseRecipesPresenter: BaseRecipesViewOutput {
     
+    /// Asks interactor to provide random data.
     public func requestRandomData() {
         interactor.provideRandomData()
     }
     
-    public func requestData(urlString: String?) {
+    /// Asks interactor to provide data for the next page.
+    public func requestData() {
+        /// Fetcing should not be in progress and there should be valid next page url.
+        guard !isFetchingInProgress,
+              let nextPageUrl = nextPageUrl else { return } // do nothing
+        
+        isFetchingInProgress = true
         /// Because it is _event handling_, we need to use `userInteractive` quality of service.
         DispatchQueue.global(qos: .userInteractive).async {
-            self.interactor.provideData(urlString: urlString)
+            self.interactor.provideData(urlString: nextPageUrl)
         }
     }
     
+    /// Resets all loading activity.
+    public func resetAllActivity() {
+        isFetchingInProgress = false
+    }
+    
+    /// Handles selecting on recipe from view.
+    ///
+    /// - Parameter recipe: Tapped recipe.
     public func didSelectRecipe(_ recipe: Recipe) {
         router.openRecipeDetailsModule(for: recipe)
+    }
+    
+    /// Defines whether it is link to the next page or not (will be pagination or not).
+    public func willRequestDataForPagination() -> Bool {
+        nextPageUrl != nil
     }
 }
 
@@ -52,8 +77,8 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
     /// 
     /// - Parameters:
     ///   - response: `Response` got from the server.
-    ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
-    public func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool) {
+    ///   - withOverridingCurrentData: Defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
+    public func didProvideResponse(_ response: Response, withOverridingCurrentData: Bool) {
         var recipes = [Recipe]()
         
         for hit in response.hits ?? [] {
@@ -62,7 +87,8 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
             recipe.description = Texts.RecipeDetails.description(name: recipe.label ?? Texts.Discover.mockRecipeTitle, index: recipes.count)
             recipes.append(recipe)
         }
-        view?.fillData(with: recipes, nextPageUrl: response.links?.next?.href, withOverridingCurrentData: withOverridingCurrentData)
+        nextPageUrl = response.links?.next?.href
+        view?.fillData(with: recipes, withOverridingCurrentData: withOverridingCurrentData)
     }
     
     /// Provides data to show in alerts according to provided `error`.
@@ -82,7 +108,6 @@ extension BaseRecipesPresenter: BaseRecipesInteractorOutput {
             case .networkError(let error):
                 self.view?.displayError(title: Texts.Errors.networkError, message: "\(error.localizedDescription)", image: Resources.Images.Errors.network)
             case .decodingError:
-                #warning("По вашему запросу ничего не найдено")
                 self.view?.displayError(title: Texts.Errors.serverError, message: Texts.Errors.somethingWentWrong, image: Resources.Images.Errors.network)
             }
         }

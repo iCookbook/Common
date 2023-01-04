@@ -16,14 +16,16 @@ public protocol BaseRecipesModuleOutput: AnyObject {
 }
 
 public protocol BaseRecipesViewInput: AnyObject {
-    func fillData(with data: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool)
+    func fillData(with data: [Recipe], withOverridingCurrentData: Bool)
     func displayError(title: String, message: String, image: UIImage?)
 }
 
 public protocol BaseRecipesViewOutput: AnyObject {
     func requestRandomData()
-    func requestData(urlString: String?)
+    func requestData()
     func didSelectRecipe(_ recipe: Recipe)
+    func resetAllActivity()
+    func willRequestDataForPagination() -> Bool
 }
 
 public protocol BaseRecipesInteractorInput: AnyObject {
@@ -32,7 +34,7 @@ public protocol BaseRecipesInteractorInput: AnyObject {
 }
 
 public protocol BaseRecipesInteractorOutput: AnyObject {
-    func didProvidedResponse(_ response: Response, withOverridingCurrentData: Bool)
+    func didProvideResponse(_ response: Response, withOverridingCurrentData: Bool)
     func handleError(_ error: NetworkManagerError)
 }
 

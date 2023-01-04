@@ -26,10 +26,6 @@ open class BaseRecipesViewController: UIViewController {
     public let presenter: BaseRecipesViewOutput
     /// Array of recipes.
     public var data: [Recipe] = []
-    /// Defines whether fetching is in progress. It is being used for pagination.
-    public var isFetchingInProgress = false
-    /// Link to the next page.
-    public var nextPageUrl: String?
     
     /// Activity indicator for displaying loading.
     public let activityIndicator: UIActivityIndicatorView = {
@@ -76,7 +72,7 @@ open class BaseRecipesViewController: UIViewController {
     /// Turns off all activity indicators and refresh controls, sets `isFetchingInProgress` to default value.
     open func resetAllActivity() {
         activityIndicator.stopAnimating()
-        isFetchingInProgress = false
+        presenter.resetAllActivity()
     }
     
     /// Method responsible for turning offline mode on.
@@ -93,7 +89,7 @@ open class BaseRecipesViewController: UIViewController {
     ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
     ///
     /// - Note: method was declared in `BaseRecipesViewInput` protocol.
-    open func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
+    open func fillData(with newData: [Recipe], withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
             // first setup or pull to refresh
             data = newData
@@ -102,7 +98,6 @@ open class BaseRecipesViewController: UIViewController {
             data.append(contentsOf: newData)
         }
         
-        self.nextPageUrl = nextPageUrl
         self.resetAllActivity()
         
         UIView.transition(with: self.recipesCollectionView, duration: 0.55, options: .transitionCrossDissolve, animations: { [unowned self] in
@@ -184,8 +179,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
             guard let footer = view as? LoadingCollectionViewFooter else {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
-            /// If there is link to the next page, start loading.
-            if nextPageUrl != nil {
+            if presenter.willRequestDataForPagination() {
                 footer.startActivityIndicator()
             }
         default:
@@ -207,7 +201,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         /// If there is link to the next page, set size for footer, if not, set size for small inset.
-        if nextPageUrl != nil {
+        if presenter.willRequestDataForPagination() {
             return CGSize(width: view.frame.size.width, height: 60)
         } else {
             return CGSize(width: view.frame.size.width, height: 20)

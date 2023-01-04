@@ -16,7 +16,7 @@ class MockNetworkManager: NetworkManagerProtocol {
     }
     
     func obtainData(request: NetworkRequest, completion: @escaping (Result<Data, NetworkManagerError>) -> Void) {
-        let data = Resources.Images.sampleRecipeImage!.pngData()!
+        let data = Resources.Images.sampleRecipeImage.pngData()!
         completion(.success(data))
     }
 }

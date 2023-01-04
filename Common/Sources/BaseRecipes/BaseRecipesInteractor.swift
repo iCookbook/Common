@@ -94,7 +94,7 @@ extension BaseRecipesInteractor: BaseRecipesInteractorInput {
         }
         
         group.notify(queue: .main) {
-            self.presenter?.didProvidedResponse(response, withOverridingCurrentData: withOverridingCurrentData)
+            self.presenter?.didProvideResponse(response, withOverridingCurrentData: withOverridingCurrentData)
         }
     }
 }
