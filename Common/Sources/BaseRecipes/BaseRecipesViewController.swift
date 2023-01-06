@@ -26,10 +26,6 @@ open class BaseRecipesViewController: UIViewController {
     public let presenter: BaseRecipesViewOutput
     /// Array of recipes.
     public var data: [Recipe] = []
-    /// Defines whether fetching is in progress. It is being used for pagination.
-    public var isFetchingInProgress = false
-    /// Link to the next page.
-    public var nextPageUrl: String?
     
     /// Activity indicator for displaying loading.
     public let activityIndicator: UIActivityIndicatorView = {
@@ -53,7 +49,6 @@ open class BaseRecipesViewController: UIViewController {
         collectionView.register(RecipeCollectionViewCell.self, forCellWithReuseIdentifier: RecipeCollectionViewCell.identifier)
         collectionView.register(UsualCollectionViewCell.self, forCellWithReuseIdentifier: UsualCollectionViewCell.identifier)
         collectionView.register(LargeRecipeCollectionViewCell.self, forCellWithReuseIdentifier: LargeRecipeCollectionViewCell.identifier)
-        collectionView.register(TitleCollectionViewHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleCollectionViewHeader.identifier)
         collectionView.register(LoadingCollectionViewFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCollectionViewFooter.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -76,7 +71,7 @@ open class BaseRecipesViewController: UIViewController {
     /// Turns off all activity indicators and refresh controls, sets `isFetchingInProgress` to default value.
     open func resetAllActivity() {
         activityIndicator.stopAnimating()
-        isFetchingInProgress = false
+        presenter.resetAllActivity()
     }
     
     /// Method responsible for turning offline mode on.
@@ -93,7 +88,7 @@ open class BaseRecipesViewController: UIViewController {
     ///   - withOverridingCurrentData: defines whether this data show override current one. This is necessary for handling requesting random data (`true`) and data by provided url (`false`).
     ///
     /// - Note: method was declared in `BaseRecipesViewInput` protocol.
-    open func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
+    open func fillData(with newData: [Recipe], withOverridingCurrentData: Bool) {
         if withOverridingCurrentData {
             // first setup or pull to refresh
             data = newData
@@ -102,7 +97,6 @@ open class BaseRecipesViewController: UIViewController {
             data.append(contentsOf: newData)
         }
         
-        self.nextPageUrl = nextPageUrl
         self.resetAllActivity()
         
         UIView.transition(with: self.recipesCollectionView, duration: 0.55, options: .transitionCrossDissolve, animations: { [unowned self] in
@@ -142,7 +136,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         data.count
     }
     
-    /// Defined as `public` because we need to override this method in `DiscoverViewController`.
+    /// Defined as `open` because we need to override this method in `DiscoverViewController`.
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LargeRecipeCollectionViewCell.identifier, for: indexPath) as? LargeRecipeCollectionViewCell else {
             fatalError("Could not cast cell at indexPath \(indexPath) to 'UsualCollectionViewCell' in 'Discover' module")
@@ -151,7 +145,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         return cell
     }
     
-    /// Defined as `public` because we need to override this method in our view controllers.
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         /// This method only shrinks recipe cell when it's been tapped.
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
@@ -165,6 +159,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
     
     // MARK: Footer
     
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionFooter:
@@ -178,14 +173,14 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         }
     }
     
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
         switch elementKind {
         case UICollectionView.elementKindSectionFooter:
             guard let footer = view as? LoadingCollectionViewFooter else {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
-            /// If there is link to the next page, start loading.
-            if nextPageUrl != nil {
+            if presenter.willRequestDataForPagination() {
                 footer.startActivityIndicator()
             }
         default:
@@ -207,7 +202,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         /// If there is link to the next page, set size for footer, if not, set size for small inset.
-        if nextPageUrl != nil {
+        if presenter.willRequestDataForPagination() {
             return CGSize(width: view.frame.size.width, height: 60)
         } else {
             return CGSize(width: view.frame.size.width, height: 20)
