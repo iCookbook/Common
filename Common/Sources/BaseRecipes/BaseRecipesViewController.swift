@@ -49,7 +49,6 @@ open class BaseRecipesViewController: UIViewController {
         collectionView.register(RecipeCollectionViewCell.self, forCellWithReuseIdentifier: RecipeCollectionViewCell.identifier)
         collectionView.register(UsualCollectionViewCell.self, forCellWithReuseIdentifier: UsualCollectionViewCell.identifier)
         collectionView.register(LargeRecipeCollectionViewCell.self, forCellWithReuseIdentifier: LargeRecipeCollectionViewCell.identifier)
-        collectionView.register(TitleCollectionViewHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleCollectionViewHeader.identifier)
         collectionView.register(LoadingCollectionViewFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCollectionViewFooter.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -137,7 +136,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         data.count
     }
     
-    /// Defined as `public` because we need to override this method in `DiscoverViewController`.
+    /// Defined as `open` because we need to override this method in `DiscoverViewController`.
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LargeRecipeCollectionViewCell.identifier, for: indexPath) as? LargeRecipeCollectionViewCell else {
             fatalError("Could not cast cell at indexPath \(indexPath) to 'UsualCollectionViewCell' in 'Discover' module")
@@ -146,7 +145,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         return cell
     }
     
-    /// Defined as `public` because we need to override this method in our view controllers.
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         /// This method only shrinks recipe cell when it's been tapped.
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
@@ -160,6 +159,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
     
     // MARK: Footer
     
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionFooter:
@@ -173,6 +173,7 @@ extension BaseRecipesViewController: UICollectionViewDelegate, UICollectionViewD
         }
     }
     
+    /// Defined as `open` because we need to override this method in our view controllers.
     open func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
         switch elementKind {
         case UICollectionView.elementKindSectionFooter:
