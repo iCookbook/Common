@@ -22,7 +22,7 @@ extension BaseRecipesRouter: BaseRecipesRouterInput {
     ///
     /// - Parameter recipe: `Recipe` instance open details with.
     public func openRecipeDetailsModule(for recipe: Recipe) {
-        let context = RecipeDetailsContext(moduleOutput: self, dataModel: recipe)
+        let context = RecipeDetailsContext(moduleOutput: self, recipe: recipe)
         let assembly = RecipeDetailsAssembly.assemble(with: context)
         // hides tab bar
         assembly.viewController.hidesBottomBarWhenPushed = true
@@ -31,16 +31,4 @@ extension BaseRecipesRouter: BaseRecipesRouterInput {
 }
 
 extension BaseRecipesRouter: RecipeDetailsModuleOutput {
-}
-
-extension BaseRecipesRouter {
-    struct RecipeDetailsContext: RecipeDetailsDependenciesProtocol {
-        weak var moduleOutput: RecipeDetailsModuleOutput?
-        let dataModel: Recipe
-        
-        init(moduleOutput: RecipeDetailsModuleOutput? = nil, dataModel: Recipe) {
-            self.moduleOutput = moduleOutput
-            self.dataModel = dataModel
-        }
-    }
 }

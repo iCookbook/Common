@@ -8,11 +8,6 @@
 import Models
 import Networking
 
-public protocol BaseRecipesDependenciesProtocol {
-    var moduleOutput: BaseRecipesModuleOutput? { get set }
-    var networkManager: NetworkManagerProtocol { get }
-}
-
 public protocol BaseRecipesModuleInput {
     var moduleOutput: BaseRecipesModuleOutput? { get }
 }
